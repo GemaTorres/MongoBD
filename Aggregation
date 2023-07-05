@@ -1,0 +1,76 @@
+//Aggregate needs an array to work
+db.collection.aggregate([ stage1, stage2, ...])
+
+//$match, it works as a filter
+// you can notice that it does not make an operation, only filters the info
+db.persons.aggregate([
+{$match: {isActive: true}}
+])
+
+// for a field with an array, $size, of an array
+db.persons.aggregate([
+{$match: {tags: {$size: 3}}}
+])
+// this is the same operation than in find
+db.persons.find(
+{tags: {$size: 3}}
+)
+
+// two fields
+db.persons.aggregate([
+{$match: {$and: [{tags: {$size: 3}}, {isActive: true}]}}
+])
+
+// syntaxis of the stages
+{ $operator: {} }
+
+// review
+$match: filter
+$group: same as in sql
+$project: filter fields in the document
+$sort: -1, 1
+$count: number of objects
+$limit: no. of documents
+$skip: amount of documents
+$out: write results into an other collection
+
+//$match examples
+{$match: {city: "New York"}}
+{$match: {age: {$gt: 25}}}
+{$match: {$and : [ {gender: "female"}, {age: {$gt:25 }} ] }}
+
+//$group syntaxis
+{ $group: {_id: expression, field1: 
+{accumulator1: expression}, ...
+}}
+
+// examples
+{$group: {_id: "$age"}}
+{$group: { _id: {age: "$age", gender: "$gender" }
+}}
+
+// now with the data base
+db.persons.aggregate ([
+{$group: {_id: "$age"}}
+])
+
+db.persons.aggregate ([
+{$group: {_id: "$gender"}}
+])
+
+db.persons.aggregate ([
+{$group: {_id: {age: "$age", gender: "$gender" }}}
+])
+
+// group by nested fields
+db.persons.aggregate([
+{$group: { _id: "$company.location.country"} }
+])
+// in this example the aggregate is going to return only the country
+
+db.persons.aggregate([
+{$group: { _id: "$company.location"} }
+])
+
+
+
