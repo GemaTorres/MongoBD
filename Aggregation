@@ -72,5 +72,162 @@ db.persons.aggregate([
 {$group: { _id: "$company.location"} }
 ])
 
+// TWO STAGES $match, $group
+db.persons.aggregate([
+{$match: {favoriteFruit: "banana"}},
+{$group: {_id: {age: "$age", eyeColor:"eyeColor"}}}
+])
 
+db.persons.aggregate([
+{$match: {gender: "female"}},
+{$group: {_id: {age: "$age", eyeColor:"eyeColor", gender: "$gender"}}}
+])
+
+// Tthe order of the stages matter
+db.persons.aggregate([
+{$group: {_id: {age: "$age", eyeColor:"eyeColor", gender: "$gender"}}},
+{$match: {gender: "female"}}
+]) /// O RESULTS
+
+// but by using _id
+db.persons.aggregate([
+{$group: {_id: {age: "$age", eyeColor:"eyeColor", gender: "$gender"}}},
+{$match: {"_id.gender": "female"}}
+])
+
+db.persons.aggregate ([
+{$group: {_id: {age: "$age", gender: "$gender" }}},
+{$match: {"_id.age": {$gt: 30}}}
+])
+
+
+//  $count
+{$count: "title"}, the last stage
+
+db.persons.aggregate([
+{$count: "allDocumentsCount"}
+])
+
+// other methods to count
+db.persons.aggregate([]).toArray.length
+db.persons.aggregate([]).itcount()
+db.persons.aggregate([{$count: "total"}])
+db.persons.find({}).count()
+
+//// 3 STAGES $match, $group, $count
+db.persons.aggregate([
+{$group: {_id: "$company.location.country"} },
+{$count: "countriesCount"}
+])
+
+//distinct values
+db.persons.aggregate([
+{$group: {_id: "$age"} },
+{$count: "age"}
+])
+
+db.persons.aggregate([
+{$group: {_id: {age: "$age", gender: "$gender" }}},
+{$count: "eyeColorGender"}
+])
+
+db.persons.aggregate([
+{$match: {age: {$gte: 25 }}},
+{$group: {_id: {age: "$age", gender: "$gender" }}},
+{$count: "eyeColorGender"}
+])
+
+// $sort
+{$sort: {field1, -1, field2: 1}}
+db.persons.aggregate([
+{$sort: {name: 1}}
+])
+
+db.persons.aggregate([
+{$sort: {age: 1}}
+])
+
+db.persons.aggregate([
+{$sort: {age: 1, gender:-1}}
+])
+
+// $group, $sort
+db.persons.aggregate([
+{$group: {_id: "$favoriteFruit"}},
+{$sort: {_id: 1}}
+])
+
+db.persons.aggregate([
+{$group: {_id: {age: "$age", gender: "$gender" }}},
+{$sort: {_id: 1}}
+])
+
+db.persons.aggregate([
+{$group: {_id: {age: "$age", gender: "$gender" }}},
+{$sort: {"_id.age": 1, "_id.favoriteFruit": -1}}
+])
+
+db.persons.aggregate([
+{$match: {eyeColor: {$ne: "blue"}}},
+{$group: {_id: {age: "$age", gender: "$gender" }}},
+{$sort: {"_id.age": 1, "_id.favoriteFruit": -1}}
+])
+
+// SATE $project
+// excludes or adds values
+{$project: {field1: 0, field2: 1, newField: expression}}
+
+db.persons.aggregate([
+{$project: {name:1, "company.location.country": 1}}
+])
+
+db.persons.aggregate([
+{$project: {name:1, "company.location": 1}}
+])
+
+// _id, is  default value 
+db.persons.aggregate([
+{$project: {isActive: 1 ,name:1, gender: 1}}
+])
+
+db.persons.aggregate([
+{$project: {_id: 0,isActive: 1 ,name:1, gender: 1}}
+])
+
+// exclude some field 
+db.persons.aggregate([
+{$project: {_id: 0,isActive: 0 ,name:0, gender: 0}}
+])
+
+// $project restructures the fields
+db.persons.aggregate([
+{$project: {
+_id:0,
+name: 1,
+// NEW FIELD
+info: {
+eyes: "eyeColor",
+fruit: "$favoriteFruit",
+country: "$company.location.country"
+}
+}}
+])
+
+db.persons.aggregate([
+{$project: {
+_id:0,
+index: 1,
+name: 1,
+// NEW FIELD
+info: {
+eyes: "$eyeColor",
+company: "$company.title",
+country: "$company.location.country"
+}
+}}
+])
+
+// $limit
+{$limit: number }
+// uses: sample, after sort
 
