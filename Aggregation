@@ -231,3 +231,126 @@ country: "$company.location.country"
 {$limit: number }
 // uses: sample, after sort
 
+db.persons.aggregate([
+{$limit: 100},
+{$match: {age: {$gt: 27}} },
+{$group: {_id: "$company.location.country"}}
+])
+
+// 6 records with this statement
+db.persons.aggregate([
+{$match: {eyeColor: {$ne: "blue"}}},
+{$group: {_id: {eyeColor: "$eyeColor", favoriteFruit: "$favoriteFruit"}}},
+{$sort: {"_id.eyeColor":1, "_id.favoriteFruit": -1}}
+])
+// same with first limit
+db.persons.aggregate([
+{$limit: 100},
+{$match: {eyeColor: {$ne: "blue"}}},
+{$group: {_id: {eyeColor: "$eyeColor", favoriteFruit: "$favoriteFruit"}}},
+{$sort: {"_id.eyeColor":1, "_id.favoriteFruit": -1}}
+])
+
+/// aggregations with arrays within documents
+db.persons.aggregate([
+{$group: {_id: "$tags"}},
+])
+//it looks wrong so use
+//$unwind
+{$unwind: arrayReference}
+// this is going to split all the values in the array into several documents
+
+db.persons.aggregate([
+{$unwind: "$tags"},
+{$project: {name:1, gender: 1, tags:1}}
+])
+
+// all tags
+db.persons.aggregate([
+{$unwind: "$tags"},
+{$group: {_id: "$tags"}}
+])
+
+// you can see if the number of records increased 
+db.persons.aggregate([
+{$unwind: "$tags"},
+{$count: "total"}
+])
+
+// ACUMULATORS
+$sum
+$max
+$avg
+$min
+are uses in the $group
+{$group:{_id: "$field0" , total: {$sum: "$field1"} }
+
+{count: {$sum: 1}}
+
+db.persons.aggregate([
+{$group: {_id: "$age", count: {$sum: 1}} }
+])
+
+db.persons.aggregate([
+{$group: {_id: "$favoriteFruit", count: {$sum: 1}} }
+])
+
+// with $unwind
+db.persons.aggregate([
+{$unwind: "$tags"},
+{$group: {_id: "$tags", count: {$sum: 1}}}
+])
+
+//$avg
+db.persons.aggregate([
+{$group: {_id: "$favoriteFruit", average: {$avg: "$age"}} }
+])
+
+db.persons.aggregate([
+{$group: {_id: "$eyeColor", average: {$avg: "$age"}} }
+])
+
+db.persons.aggregate([
+{$group: {_id: "$company.location.country", average: {$avg: "$age"}} }
+])
+
+db.persons.aggregate([
+{$group: {_id: {age: "$eyeColor", gender: "$gender" }, average: {$avg: "$age"}} }
+])
+
+// UNARAY OPERATORS $project, can be used in $group but only with accumulaors
+$type : string
+$it
+$and
+$or
+$gt
+$multiply
+
+//$type
+db.persons.aggregate([
+{$project: {
+name:1, 
+eyeColorType: {$type: "$eyeColor"},
+ageType: {$type: "$age"}
+}}
+])
+
+//$out 
+// helps to writhe the result into a new collection
+{$out: "newCollection"}
+// must be the last 
+
+db.persons.aggregate([
+{$group: {_id: "$company.location.country", average: {$avg: "$age"}} },
+{$out: "aggRes1"}
+])
+
+//allowDiskUse
+{allowDiskUse: true}
+// for large resources
+db.persons.aggregate([], {allowDiskUse: true})
+
+
+
+
+
