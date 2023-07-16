@@ -1,0 +1,56 @@
+--La forma más fácil de conseguir los drivers de Node.js 2.0 es usando NPM (Node Package Manager). 
+--Nada más crear el proyecto con npm init, se pueden instalar los drivers de MongoDB y sus dependencias con el siguiente comando:
+
+npm install mongodb --save
+
+-- Con ello se descargarán los drivers y se añadirá una dependencia en el archivo package.json. 
+-- También se recomienda bajar la extensión bson-ext, ya que proporciona mejores formas de serialización y deserialización
+
+npm install bson-ext --save
+
+-- Para conectarse al servidor y la base de datos basta con añadir las siguientes líneas de código:
+var MongoClient = require('mongodb').MongoClient , assert = require('assert');
+// Connection URL
+var url = 'mongodb://localhost:27017/miProyecto';
+// Use connect method to connect to the server
+MongoClient.connect(url, function(err, db) { assert.equal(null, err); console.log("Conexión realizada con éxito"); db.close();
+});
+
+-- Ejemplo de INSERTAR docuemntos
+var insertDocuments = function(db, callback) {
+// Get the documents collection
+var collection = db.collection('documents');
+  // Insert some documents
+collection.insertMany([
+{a : 1}, {a : 2}, {a : 3}
+], function(err, result) {
+assert.equal(err, null);
+assert.equal(3, result.result.n);
+assert.equal(3, result.ops.length); console.log("Inserted 3 documents into the collection"); callback(result);
+     }); 
+}
+
+El comando insert devuelve un objeto con los siguientes campos:
+ result: contiene el documento resultado de MongoDB.
+ ops: contiene el documento insertado con el campo _id añadido.
+ connection: contiene la conexión utilizada para llevar a cabo el insert.
+Para llamar a la función insertDocument es necesario añadir el siguiente código:
+
+var MongoClient = require('mongodb').MongoClient , assert = require('assert');
+// Connection URL
+var url = 'mongodb://localhost:27017/myproject'; // Use connect method to connect to the server MongoClient.connect(url, function(err, db) {
+assert.equal(null, err);
+console.log("Connected successfully to server"); insertDocuments(db, function() {
+db.close(); });
+});
+
+-- BUSQUEDA
+var findDocuments = function(db, callback) {
+// Get the documents collection
+var collection = db.collection('documents');
+  // Find some documents
+collection.find({'a': 3}).toArray(function(err, docs) { assert.equal(err, null);
+console.log("Found the following records"); console.log(docs);
+callback(docs);
+}); 
+}
