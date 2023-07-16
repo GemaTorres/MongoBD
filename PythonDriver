@@ -1,0 +1,40 @@
+--Para instalar PyMongo en Linux lo mejor es utilizar pip:
+pip install pymongo
+
+--Para importar MongoClient desde PyMongo es necesario ejecutar el siguiente comando:
+from pymongo import MongoClient
+
+-- Para crear una conexión utilizamos el cliente MongoClient(), 
+--que se conectará a localhost y al puerto 27017 si no se especifica 
+--ningún argumento. A continuación, se muestran unos ejemplos de conexión:
+
+client = MongoClient()
+client = MongoClient("mongodb://mongo.example.es:27017")
+
+-- Para acceder al objeto de base de datos se pueden utilizar 
+-- cualquiera de las dos formas que se muestran a continuación:
+db = client.myDB 
+db = client['myDb']
+
+--  Para acceder a una colección se procede de la siguiente forma:
+coll = db.myCollection 
+coll = db['myCollection']
+
+-- Si se quiere insertar un documento:
+result = db.coches.insert_one(
+    {
+        "coche": {
+            "marca": "BMW",
+            "Modelo": "430d",
+            "CV": "220",
+            "colores": ["rojo", "negro"]
+        } 
+    }
+
+-- Para realizar una búsqueda:
+cursor = db.coches.find({"marca": "BMW"})
+for document in cursor:
+    print(document)
+
+-- Y, por lo tanto, para borrar un documento:
+result = db.coches.delete_many({"marca": "BMW"})
