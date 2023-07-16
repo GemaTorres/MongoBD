@@ -1,0 +1,36 @@
+MAP REDUCE
+db.collection.mapReduce (
+// MAP
+function() {emit (key, value) ;},
+// REDUCE
+function(key, values) {return
+reduceFunction}, 
+{
+out: collection
+query: document // filtros
+sort: document
+limit: number
+}
+)
+
+
+// definir map
+ var map = function(){emit (this.customer, this. total)}
+
+// definir reduce 
+function(key, values)
+Key sera aquí el _id en la otra función de age
+
+var reduce = function(customer, total) {return Array.sum(total);}
+
+/// MAP REDUCE 
+db.sells.mapReduce(map, reduce, {out: "cust_sell"})
+
+// con sort
+db.sells.mapReduce(map, reduce, {out: "cust_sell"}, {sort:-1})
+
+// con filtro 
+db.sells.mapReduce(map, reduce, {out: "cust_sell"}, {sort:-1}, {query: {customer: {$in:["Mike", "Karen"]}} })
+
+/// ver resultado en una collection
+db.cust_sell.find()
