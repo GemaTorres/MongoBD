@@ -1,0 +1,190 @@
+—- to start mongoldb
+mongosh
+
+— to show data 
+show dbs
+
+— to use a database
+use admin
+
+— to create a new one with other name
+use newname
+
+— when we change the database the cursor changes with the name
+— now we have two types of resources, data bases and collections (tables inside db)
+show collections
+
+— to drop a database
+db.dropDatabase()
+— it looks like appdb> db.dropDatabase(), so we are deleting appdb
+
+— if we click one more
+show dbs 
+— then appdb does not exist anymore, but the command still appdb>  this is sth like R, you do need to create a new object to work with, it is only necessary to call it
+
+exit
+
+use appdb
+— the database doesn’t exist until we upload it with data
+
+— to know in which table are we just write
+db
+— and to access for one table and insert
+db.users.insertOne({ name: "John"})
+— it gives you and ID automatically 
+
+— if we want to see the record
+db.users.find()
+
+—you don’t have to worry about creating a table, cus every database has collections, and that collections have tables, that have documents
+
+—- you can add as much attributes as you rather
+db.users.insertOne({ name: "Sally", age: 19, address: { street: "987 North Street"}, hobbies: ["Running"]})
+— se abren llaves cuando es el primer atributo, o cuando hay mas de dos, cuando solo es uno con los corchetes bastan
+
+— to clear the screen cls
+— to insert multiple records
+db.users.insertMany([{ name: "Jill"}, {name: "Mike"}])
+— more attributes
+ db.users.insertMany([{name: "Kyle", age: 26, hobbies: ["Weight Lifting", "Bowling"], address:{ street: "123 Main Street", city: "New York City"}}, {name: "Billy", age: 41, hobbies: ["Swimming", "Bowling"], address:{ street: "423 South Street", city: "New York City"}}]) 
+—-
+
+— how do we query (organize) this information
+db.users.find().limit(2)
+—— sort by name
+db.users.find().sort({name: 1}).limit(2)
+— 1, positive, -1 negative sort
+db.users.find().sort({name: -1}).limit(2)
+—sort by multiple fields
+db.users.find().sort({age: 1,  name: 1 }).limit(2)
+— now lets say that we want to skip the first and sort 
+db.users.find().skip(1).limit(3)
+
+——now how to filter the information by field
+db.users.find({name: "Kyle"})
+db.users.find({age: 26})
+——we can select only some columns where name equals to Kyle
+db.users.find({name: "Kyle"}, {name: 1, age:1})
+—if you don’t want to see the id
+db.users.find({name: "Kyle"}, {name: 1, age:1, _id: 0})
+—get all the fields except age
+db.users.find({name: "Kyle"}, {age:0})
+
+ADVANCED STUFF
+Every complex query starts with $, $eq, is the same than equals to sth
+db.users.find({name: {$eq: "Sally" }} )
+— or we can say not equal
+db.users.find({name: {$ne: "Sally" }} )
+—greater than
+db.users.find({age: {$gt: 13}})
+—greater than or equal to
+db.users.find({age: {$gte: 13}})
+— less than or equal to
+db.users.find({age: {$lte: 19}})
+— less than
+db.users.find({age: {$lt: 19}})
+— clause in as in sql
+db.users.find({ name: { $in: ["Kyle","Sally"]}})
+— not in 
+db.users.find({ name: { $nin: ["Kyle","Sally"]}})
+—$exists, to know if this attribute exists for each person, even if it is null
+db.users.find({age: { $exists: true }})
+— or the one that do not have that attribute
+db.users.find({age: { $exists: false }})
+
+COMBINE MULTIPLE QUERIES
+db.users.find({age: {$gte: 20, $lte: 40}})
+db.users.find({age: {$gte: 20, $lte: 40}, name: "Sally"})
+—combine two or more rules in an array, this with and and and it works the same than in the other example, bur if you wants to use an or
+db.users.find({ $and:[ {age: 26}, {name: "Kyle"}] })
+—or 
+db.users.find({ $or:[ {age: 26}, {name: "Kyle"}] })
+db.users.find({ $or:[ {age: {$lte:20} }, {name: "Kyle"}] })
+— not equal or less
+db.users.find({ age:{ $not: {lte: 20} } })
+— if you add a not, you also are gonna bring those records without a age
+Could be the same than
+db.users.find({ age:{ $gt: 20} })
+— but this query is not going to show, those ones without age
+— you can also operate with columns using $expr
+ db.users.find({ $expr: {$gt:["debt","balance"] } })
+— but you are going to have all the outcomes even if they do not have that attributes 
+— in order to fix that use $ for the columns
+
+— To query attributes inside of an other attribute
+db.users.find({ "address.street": "123 Main Street"})
+— First User (ID)
+db.users.findOne({age: {$lte:40 }})
+— to count 
+db.users.countDocuments({age: {$lte:40 }})
+
+
+UPDATING DATA
+So first you have to filter those ones that you want to update, anthem use the operator $set
+db.users.updateOne({ age:26}, {$set:{age: 27}} )
+— to be more clear it’s better to use the ID
+db.users.updateOne({ id_: ObjectId("645ce7d2eb917244355b9259") }, {$set: {name: "New Name"}})
+— increment age
+db.users.updateOne({ _id: ObjectId("645ce7d2eb917244355b9259") }, {$inc: {age: 3 }})
+- rename a column 
+db.users.updateOne({ _id: ObjectId("645ce7d2eb917244355b9259") }, {$rename: {name: "firstName" }})
+- remove a property
+db.users.updateOne({ _id: ObjectId("645ce7d2eb917244355b9259") }, {$unset: {age: "" }})
+- add to list one value
+db.users.updateOne({ _id: ObjectId("645ce7d2eb917244355b9259") }, {$push: {hobbies: "Swimming" }})
+- remove value
+db.users.updateOne({ _id: ObjectId("645ce7d2eb917244355b9259") }, {$pull: {hobbies: "Swimming" }})
+- all that we talked about the filter that we can use in the filter, this applies here for updating data
+
+- Many Users
+ db.users.updateMany({ address: {$exists: true}}, {$unset: {address: ""}})
+- REPLACE, this do not use an operator, this is only the values you want to replace
+But this is going to delete and replace with the values you gave, deleting everything else
+db.users.replaceOne({age: 30}, {name: "John"})
+
+-delete one record
+db.users.deleteOne({ name: "John"})
+- delete many
+
+
+AGGREGATE
+// Find out how many toothbrushes we sold 
+db.sells.count({product: "toothbrush”})
+
+// Find a list of all products sold
+db.sells.distinct("product")
+
+// Find the total amount of money spent by each customer
+db.sells.aggregate(
+	[
+	{$match: {}},
+	{$group: {_id: “$customer”, total: {$sum: “$total“} }}
+	]
+)
+
+store> db.sells.aggregate([{$match: {}}, {$group: {_id: "$customer", total: {$sum: "$total"} }}])
+
+$group: es la estructura que queremos dar al resultado, i.e numero de columnas
+
+// Find the total amount of money earned by each product
+db.sells.aggregate([{$match: {}}, {$group: {_id: "$product”, total: {$sum: "$total"} }}])
+
+/// sorted
+db.sells.aggregate(
+[
+{$match: {}}, 
+{$group: {_id: "$product", total: {$sum: "$total"} }}, 
+{$sort: {total:-1}}
+]
+)
+
+/// operator match is the filter
+db.sells.aggregate( 
+[ 
+{ $match: {customer: {$in: ["Mike", "Karen"]}} }, 
+{ $group: { _id: "$product", total: { $sum: "$total" } } }, 
+{ $sort: { total: -1 } }
+] 
+)
+
+
