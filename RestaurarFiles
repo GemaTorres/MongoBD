@@ -1,0 +1,19 @@
+--Pasos para migrar y restaurar .bson
+
+1. Abrir la terminal
+2.  cd /Users/gemaitzeltorresmejia/Downloads/
+3. cd dump
+4.  ls (para ver los archivos adentro, listing)
+5. Migrar los datos, usar sig comando
+
+mongorestore -d sample_airbnb -c listingsAndReviews /Users/gemaitzeltorresmejia/Downloads/dump/sample_airbnb/listingsAndReviews.bson
+
+-d
+database
+-c
+collection
+
+--Mas ejemplos:
+mongorestore -d video -c moviesScratch /Users/gemaitzeltorresmejia/Downloads/dump/video/moviesScratch.bson
+-- archivo tipo .json
+mongorestore -d biblioteca -c books /Users/gemaitzeltorresmejia/Downloads/books.json
