@@ -1,0 +1,7 @@
+Pasos:
+
+1. ir al directorio
+cd /Users/gemaitzeltorresmejia/Downloads/
+
+2. usar Mongo Import
+mongoimport --db biblioteca --collection books --type json --file books.json
