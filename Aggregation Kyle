@@ -1,0 +1,39 @@
+AGGREGATE
+// Find out how many toothbrushes we sold 
+db.sells.count({product: "toothbrush”})
+
+// Find a list of all products sold
+db.sells.distinct("product")
+
+// Find the total amount of money spent by each customer
+db.sells.aggregate(
+	[
+	{$match: {}},
+	{$group: {_id: “$customer”, total: {$sum: “$total“} }}
+	]
+)
+
+store> db.sells.aggregate([{$match: {}}, {$group: {_id: "$customer", total: {$sum: "$total"} }}])
+
+$group: es la estructura que queremos dar al resultado, i.e numero de columnas
+
+// Find the total amount of money earned by each product
+db.sells.aggregate([{$match: {}}, {$group: {_id: "$product”, total: {$sum: "$total"} }}])
+
+/// sorted
+db.sells.aggregate(
+[
+{$match: {}}, 
+{$group: {_id: "$product", total: {$sum: "$total"} }}, 
+{$sort: {total:-1}}
+]
+)
+
+/// operator match is the filter
+db.sells.aggregate( 
+[ 
+{ $match: {customer: {$in: ["Mike", "Karen"]}} }, 
+{ $group: { _id: "$product", total: { $sum: "$total" } } }, 
+{ $sort: { total: -1 } }
+] 
+)
