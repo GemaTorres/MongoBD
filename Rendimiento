@@ -1,0 +1,28 @@
+Hay varios tipos de indexación:
+Simple: insertamos un índice en orden ascendente para el atributo name. 
+El comando para insertar el índice y la búsqueda que lo aplica son los siguientes:
+
+db.users.ensureIndex( { "name" : 1} )
+db.usesr.find({ name: “Fernando Alonso” })
+
+Compuesto: se pueden usar para consultar uno o varios campos sin incluir todos. 
+El siguiente ejemplo permitirá optimizar la búsqueda para name, o para name y age. 
+Si se quiere hacer solo sobre age, habría que crear un índice simple para este atributo. 
+En el siguiente ejemplo se crea un índice para name y age y se crea la consulta que se aprovecha de esta optimización:
+
+db.users.ensureIndex( { "name" : 1, "age":-1 } )
+db.usesr.find( {name: “Fernando Alonso”, age:36 })ç
+
+Subdocumento: si el atributo pertenece a un objeto, es necesario llegar al nivel deseado para asegurar el índice. 
+El insertado del índice y la consulta que utiliza la optimización son las siguientes:
+
+db.users.ensureIndex( { "info.friend" : 1 } )
+db.user.find({ info.friend: “Pedro”})
+
+Arrays: se pueden crear índices sobre claves que contienen arrays; 
+para ello se crea un valor en el índice para cada valor del array. 
+Se denominan índices multikey y no hace falta intimidarlo explícitamente. 
+El insertado del índice y la consulta que utiliza la optimización son las siguientes:
+
+db.users.ensureIndex( { "hobbies": 1} )
+db.users.find({ hobbies: “motor” })
