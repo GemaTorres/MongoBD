@@ -46,8 +46,10 @@ db.users.insertOne({ name: "Sally", age: 19, address: { street: "987 North Stree
 — to insert multiple records
 db.users.insertMany([{ name: "Jill"}, {name: "Mike"}])
 — more attributes
- db.users.insertMany([{name: "Kyle", age: 26, hobbies: ["Weight Lifting", "Bowling"], address:{ street: "123 Main Street", city: "New York City"}}, {name: "Billy", age: 41, hobbies: ["Swimming", "Bowling"], address:{ street: "423 South Street", city: "New York City"}}]) 
-—-
+ db.users.insertMany([{name: "Kyle", age: 26, hobbies: ["Weight Lifting", "Bowling"], address:{ street: "123 Main Street", city: "New York City"}}, 
+	{name: "Billy", age: 41, hobbies: ["Swimming", "Bowling"], address:{ street: "423 South Street", city: "New York City"}}]) 
+
+
 
 — how do we query (organize) this information
 db.users.find().limit(2)
@@ -145,46 +147,5 @@ db.users.replaceOne({age: 30}, {name: "John"})
 -delete one record
 db.users.deleteOne({ name: "John"})
 - delete many
-
-
-AGGREGATE
-// Find out how many toothbrushes we sold 
-db.sells.count({product: "toothbrush”})
-
-// Find a list of all products sold
-db.sells.distinct("product")
-
-// Find the total amount of money spent by each customer
-db.sells.aggregate(
-	[
-	{$match: {}},
-	{$group: {_id: “$customer”, total: {$sum: “$total“} }}
-	]
-)
-
-store> db.sells.aggregate([{$match: {}}, {$group: {_id: "$customer", total: {$sum: "$total"} }}])
-
-$group: es la estructura que queremos dar al resultado, i.e numero de columnas
-
-// Find the total amount of money earned by each product
-db.sells.aggregate([{$match: {}}, {$group: {_id: "$product”, total: {$sum: "$total"} }}])
-
-/// sorted
-db.sells.aggregate(
-[
-{$match: {}}, 
-{$group: {_id: "$product", total: {$sum: "$total"} }}, 
-{$sort: {total:-1}}
-]
-)
-
-/// operator match is the filter
-db.sells.aggregate( 
-[ 
-{ $match: {customer: {$in: ["Mike", "Karen"]}} }, 
-{ $group: { _id: "$product", total: { $sum: "$total" } } }, 
-{ $sort: { total: -1 } }
-] 
-)
 
 
