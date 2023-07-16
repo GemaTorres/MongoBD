@@ -1,0 +1,43 @@
+-- Para usar MongoDB en Java es necesario bajar las librerías
+  <dependencies> <dependency> <groupId>org.mongodb</groupId> 
+  <artifactId>mongodb-driver</artifactId> 
+  <version>3.4.2</version> </dependency> </dependencies>
+
+  --Para realizar los primeros ejemplos se recomienda descargar los siguientes archivos:
+--incluye la documentación
+mongo-java-driver-3.4.2-javadoc.jar
+-- incluye las fuentes
+mongo-java-driver-3.4.2-source.jar
+-- incluye los diferentes métodos
+mongo-java-driver-3.4.2.jar
+
+--- Por defecto el driver de Java se conecta a localhost por el puerto 27017. Para conectarse a la base de datos con los parámetros por defecto:
+MongoClient mongoClient = new MongoClient();
+
+--Si la base de datos está en un host específico:
+MongoClient mongoClient = new MongoClient( "host1" );
+
+-- Si está en un host específico con un puerto específico:
+MongoClient mongoClient = new MongoClient(new MongoClientURI("mongodb://host1:27017"));
+
+--Una vez obtenido el objeto que conecta con MongoDB es necesario acceder a una base de datos específica:
+MongoDatabase database = mongoClient.getDatabase("test");
+
+-- Ya solo falta acceder a la colección:
+MongoCollection<Document> collection = database.getCollection("estudiantes");
+
+-- CONSULTAS en MONGO DB con Java 
+-- un documento se convierte de 
+  {“marca” : “BMW”, “puertas” : [3, 5] }
+-- como:
+new BsonDocument().append("marca", new BsonString("BMW")) .append("puertas", new BsonArray(Arrays.asList(new
+BsonInt32(3), new BsonInt32(5))));
+
+-- para consultar 
+collection.find(new Document("marca","BMW"))
+
+-- insertar documentos
+Document document = new Document("marca", "Audi")
+  .append("motor", new Document("CC", 3000).append("CV",210)) .append("modelo", "A5")
+  .append("colores", Arrays.asList("rojo", "negro", "blanco"));
+         collection.insertOne(document);
